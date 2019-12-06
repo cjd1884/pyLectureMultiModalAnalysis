@@ -73,4 +73,4 @@ def main():
     #ut.plot_feature_histograms(features, feature_names, class_names)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
