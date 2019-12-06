@@ -1,0 +1,4 @@
+pyAudioAnalysis
+plotly
+matplotlib
+numpy
