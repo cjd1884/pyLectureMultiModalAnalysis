@@ -2,12 +2,12 @@
 # coding: utf-8
 
 # # pyLectureMultiModalAnalysis
-# 
+#
 # ## Feature extraction from video segment
-# 
+#
 # ### Functions: 2
 # #### video2frame(), frame2features()
-# 
+#
 # ### Author: Stelios Karozis
 
 # ## video2frame()
@@ -31,10 +31,15 @@ def video2frame(sec,folderVID,file,folderIMG):
 
 
 def frame2features(frame):
+    import tensorflow as tf
     from keras.preprocessing import image
     from keras.applications.vgg16 import VGG16
     from keras.applications.vgg16 import preprocess_input
     import numpy as np
+
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    sess = tf.Session(config=config)
 
     model = VGG16(weights='imagenet', include_top=False)
     #model.summary()
@@ -87,7 +92,7 @@ for i in range(len(files)):
             print(fr)
             ftr = frame2features(fr)
             ftr_array.append(ftr)
-            
+
 ftr_array = np.vstack(ftr_array)
 
 
@@ -98,7 +103,3 @@ ftr_array.shape
 
 
 # In[ ]:
-
-
-
-
