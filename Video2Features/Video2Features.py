@@ -65,7 +65,7 @@ def frame2features(frame):
 import os
 from os.path import isfile, join
 import numpy as np
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 pathIn= './videos/'
 pathOut='./frames/'
 
@@ -75,13 +75,14 @@ ftr_array=[]
 files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]#for sorting the file names properly
 files.sort(key = lambda x: x[5:-4])
 for i in range(len(files)):
+    ftr_fr=[]
     filename=pathIn + files[i]
     print(filename)
     sec = 0
     count=1
     success,fr = video2frame(sec,pathIn,files[i],pathOut)
     ftr = frame2features(fr)
-    ftr_array.append(ftr)
+    ftr_fr.append(ftr)
 
     while success:
         count = count + 1
@@ -91,15 +92,15 @@ for i in range(len(files)):
         if success == True:
             print(fr)
             ftr = frame2features(fr)
-            ftr_array.append(ftr)
-
+            ftr_fr.append(ftr)
+    ftr_fr = np.vstack(ftr_fr) 
+    ftr_fr = np.average(ftr_fr, axis=0)
+    ftr_array.append(ftr_fr)
 ftr_array = np.vstack(ftr_array)
 
-
+np.save('Video2Features',ftr_array)
 # In[4]:
 
-
-ftr_array.shape
-
+print(ftr_array.shape)
 
 # In[ ]:
