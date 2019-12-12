@@ -104,3 +104,10 @@ venv.bak/
 .mypy_cache/
 
 Video2Features/run2server.sh
+
+
+# Idea files (PyCharm)
+.idea
+
+# Mac files
+.DS_Store
