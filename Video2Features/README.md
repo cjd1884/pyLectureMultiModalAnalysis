@@ -1,7 +1,7 @@
 # Video to Frames to Features
 
 ## Version 0.2 Alpha
-The current directory consist of 2 functions:
+Changes:
 1. unify data directory with audio feature extraction
 2. change export information structure (numpy_array)
 3. save dataframe instead of numpy array
