@@ -54,6 +54,7 @@ def frame2features(frame):
 
     vgg16_feature_np = np.array(vgg16_feature)
     feature = vgg16_feature_np.flatten()
+    tf.reset_default_graph()
     return feature
 
 
@@ -63,24 +64,32 @@ def frame2features(frame):
 
 
 import os
-from os.path import isfile, join
+import glob
 import numpy as np
+import pandas as pd
+import pathlib
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-pathIn= './videos/'
-pathOut='./frames/'
 
+pathIn= '../data/'
+index = pd.read_csv(pathIn+'index.csv', sep=';')
 
 frameRate = 0.5 #//it will capture image in each 0.5 second -> 2fps
 ftr_array=[]
-files = [f for f in os.listdir(pathIn) if isfile(join(pathIn, f))]#for sorting the file names properly
-files.sort(key = lambda x: x[5:-4])
-for i in range(len(files)):
+
+for f,s in index[['FILE','SEG']].values:
+    pathIn= '../data/'+f+'/'
+    print(pathlib.Path('pathIn').suffix)
+    pathOut='../data/'+f+'/frames/'
+    files=f+'_'+str(s)    
+    files=glob.glob(pathIn+files+'*')[0]
+    suffix=os.path.splitext(files)[1]
+    files=f+'_'+str(s)+suffix
     ftr_fr=[]
-    filename=pathIn + files[i]
+    filename=pathIn + files
     print(filename)
     sec = 0
     count=1
-    success,fr = video2frame(sec,pathIn,files[i],pathOut)
+    success,fr = video2frame(sec,pathIn,files,pathOut)
     ftr = frame2features(fr)
     ftr_fr.append(ftr)
 
@@ -88,7 +97,7 @@ for i in range(len(files)):
         count = count + 1
         sec = sec + frameRate
         sec = round(sec, 2)
-        success,fr = video2frame(sec,pathIn,files[i],pathOut)
+        success,fr = video2frame(sec,pathIn,files,pathOut)
         if success == True:
             print(fr)
             ftr = frame2features(fr)
@@ -98,9 +107,12 @@ for i in range(len(files)):
     ftr_array.append(ftr_fr)
 ftr_array = np.vstack(ftr_array)
 
-np.save('Video2Features',ftr_array)
+
+ftr_df = pd.DataFrame(data=ftr_array)
+df=index.copy()
+df=pd.concat([df,ftr_df], axis=1)
 # In[4]:
 
-print(ftr_array.shape)
+df.to_pickle('../data/Video2Features.pkl')
 
 # In[ ]:
