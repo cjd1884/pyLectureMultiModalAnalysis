@@ -5,8 +5,8 @@
 #
 # ## Feature extraction from video segment
 #
-# ### Functions: 2
-# #### video2frame(), frame2features()
+# ### Functions: 3
+# #### video2frame(), frame2features(), Video2feature() <-- Main function
 #
 # ### Author: Stelios Karozis
 
@@ -62,57 +62,59 @@ def frame2features(frame):
 
 # In[3]:
 
+def Video2feature(pathIn='../data/',frameRate=0.5, save=True):
+    import os
+    import glob
+    import numpy as np
+    import pandas as pd
+    import pathlib
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-import os
-import glob
-import numpy as np
-import pandas as pd
-import pathlib
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    pathIn=pathIn
+    index = pd.read_csv(pathIn+'index.csv', sep=';')
 
-pathIn= '../data/'
-index = pd.read_csv(pathIn+'index.csv', sep=';')
+    frameRate = frameRate #//it will capture image in each 0.5 second -> 2fps
+    ftr_array=[]
 
-frameRate = 0.5 #//it will capture image in each 0.5 second -> 2fps
-ftr_array=[]
-
-for f,s in index[['FILE','SEG']].values:
-    pathIn= '../data/'+f+'/'
-    print(pathlib.Path('pathIn').suffix)
-    pathOut='../data/'+f+'/frames/'
-    files=f+'_'+str(s)    
-    files=glob.glob(pathIn+files+'*')[0]
-    suffix=os.path.splitext(files)[1]
-    files=f+'_'+str(s)+suffix
-    ftr_fr=[]
-    filename=pathIn + files
-    print(filename)
-    sec = 0
-    count=1
-    success,fr = video2frame(sec,pathIn,files,pathOut)
-    ftr = frame2features(fr)
-    ftr_fr.append(ftr)
-
-    while success:
-        count = count + 1
-        sec = sec + frameRate
-        sec = round(sec, 2)
+    for f,s in index[['FILE','SEG']].values:
+        pathIn= '../data/'+f+'/'
+        print(pathlib.Path('pathIn').suffix)
+        pathOut='../data/'+f+'/frames/'
+        files=f+'_'+str(s)    
+        files=glob.glob(pathIn+files+'*')[0]
+        suffix=os.path.splitext(files)[1]
+        files=f+'_'+str(s)+suffix
+        ftr_fr=[]
+        filename=pathIn + files
+        print(filename)
+        sec = 0
+        count=1
         success,fr = video2frame(sec,pathIn,files,pathOut)
-        if success == True:
-            print(fr)
-            ftr = frame2features(fr)
-            ftr_fr.append(ftr)
-    ftr_fr = np.vstack(ftr_fr) 
-    ftr_fr = np.average(ftr_fr, axis=0)
-    ftr_array.append(ftr_fr)
-ftr_array = np.vstack(ftr_array)
+        ftr = frame2features(fr)
+        ftr_fr.append(ftr)
+
+        while success:
+            count = count + 1
+            sec = sec + frameRate
+            sec = round(sec, 2)
+            success,fr = video2frame(sec,pathIn,files,pathOut)
+            if success == True:
+                print(fr)
+                ftr = frame2features(fr)
+                ftr_fr.append(ftr)
+        ftr_fr = np.vstack(ftr_fr) 
+        ftr_fr = np.average(ftr_fr, axis=0)
+        ftr_array.append(ftr_fr)
+    ftr_array = np.vstack(ftr_array)
 
 
-ftr_df = pd.DataFrame(data=ftr_array)
-df=index.copy()
-df=pd.concat([df,ftr_df], axis=1)
-# In[4]:
+    ftr_df = pd.DataFrame(data=ftr_array)
+    df=index.copy()
+    df=pd.concat([df,ftr_df], axis=1)
+    # In[4]:
+    if save == True:
+        df.to_pickle('../data/Video2Features.pkl')
 
-df.to_pickle('../data/Video2Features.pkl')
+    return
 
 # In[ ]:

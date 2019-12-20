@@ -1,5 +1,8 @@
 # Video to Frames to Features
 
+## Version 0.3 Alpha
+1. Define the process as callable function
+
 ## Version 0.2 Alpha
 Changes:
 1. unify data directory with audio feature extraction
