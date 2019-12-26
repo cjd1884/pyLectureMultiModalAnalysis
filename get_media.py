@@ -99,12 +99,12 @@ def download_medium(youtube_url,
                                                     filename_prefix=None)
 
 
-def download_media(doc_path,
-                   out_dir,
-                   res='360p',
-                   abr='128kpbs',
-                   subtype='mp4'
-                   ):
+def main(doc_path,
+        out_dir,
+        res='360p',
+        abr='128kpbs',
+        subtype='mp4'
+        ):
     '''Download audio and video from a YouTube object; url addresses are provided by a text file
 
     Input:
@@ -125,6 +125,7 @@ def download_media(doc_path,
         download_medium(youtube_url=url, out_dir=out_dir, audio_filename=audio_name, video_filename=video_name,
                        res='360p', abr='128kbps', subtype='mp4')
 
-# test run with dummy dataset
-download_media(doc_path='./yt_dummy.txt',
-              out_dir='./data')
+if __name__=='__main__':
+    # test run with dummy dataset
+    main(doc_path='./yt_dummy.txt',
+        out_dir='./data')
