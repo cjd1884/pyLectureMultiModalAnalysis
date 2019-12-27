@@ -8,8 +8,8 @@ Short description: A script for merging associated video and audio files into a 
 import ffmpy
 import os
 
-def main(in_dir='../data',
-         out_dir='../data'):
+def main(in_dir='./data',
+         out_dir='./data'):
     '''
     Merges a video file with its associated audio file creating a single medium, which it is
     stored in a directory `out_dir/media/`
