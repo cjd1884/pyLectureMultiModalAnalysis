@@ -1,6 +1,6 @@
 '''
 Short description: Script for segmenting a YouTube Video.
- The segmentation process relies on librosa's 'split on non-silent' audio parts functionality
+ The segmentation process relies on librosa's split on non-silent audio parts functionality
 '''
 
 import librosa
