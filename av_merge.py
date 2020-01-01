@@ -1,6 +1,5 @@
 '''
-Short description: A script for merging associated video and audio files into a single
- medium using FFMPEG.
+Short description: Script for merging associated video and audio files into a single medium using FFMPEG.
  It expects that audio files are stored as `in_dir/audio/audio_k.mp4`
  (and similarly for video) and stores the newly created file as `out_dir/media/medium_k.mp4`
 '''
