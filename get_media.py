@@ -1,6 +1,6 @@
 '''
 Short description: Leveraging on `pytube`, this script downloads and stores locally
- the audio and video files associated with a YouTube object.
+ the audio and video files associated with a YouTube Video.
  Audio and video files are stored in seperate folders.
  '''
 
