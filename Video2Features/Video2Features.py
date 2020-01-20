@@ -13,7 +13,22 @@
 # ## video2frame()
 
 # In[1]:
-
+def RandomVector(trainmode=True,sz=100):
+    import pickle
+    import numpy as np
+    if trainmode==False:
+        try:
+            vector = pickle.load(open("random.pickle", "rb"))
+        except (OSError, IOError) as e:
+            vector = 3
+            print('Error the random vector is missing')
+    else:
+        vector=[]
+        for i in range(sz):
+            tmp=random.uniform(0.5, 1.0)
+            vector.append(tmp)
+        vector.to_pickle("random.pickle")
+    return vector
 
 def video2frame(sec,folderVID,file,folderIMG):
     import cv2
@@ -55,7 +70,8 @@ def frame2features(frame):
     vgg16_feature_np = np.array(vgg16_feature)
     feature = vgg16_feature_np.flatten()
     tf.reset_default_graph()
-    return feature
+    vector = RandomVector(trainmode=True,sz=100)
+    return feature*vector
 
 
 # ## Combined
