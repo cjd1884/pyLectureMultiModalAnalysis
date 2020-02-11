@@ -179,8 +179,8 @@ def Video2feature(pathIn='./data/',frameRate=0.5, save=True):
 # In[85]:
 
 
-df = Video2feature(pathIn='../data/',frameRate=0.5, save=False)
-df
+#df = Video2feature(pathIn='../data/',frameRate=0.5, save=False)
+#df
 
 
 # In[33]:
