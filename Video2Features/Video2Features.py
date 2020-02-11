@@ -2,20 +2,25 @@
 # coding: utf-8
 
 # # pyLectureMultiModalAnalysis
-#
+# 
 # ## Feature extraction from video segment
-#
-# ### Functions: 3
-# #### video2frame(), frame2features(), Video2feature() <-- Main function
-#
+# 
+# ### Functions: 2
+# #### video2frame(), frame2features()
+# 
 # ### Author: Stelios Karozis
 
-# ## video2frame()
+# ## RandomVector()
 
-# In[1]:
+# In[51]:
+
+
 def RandomVector(trainmode=True,sz=100):
     import pickle
     import numpy as np
+    from numpy import array
+    import random
+    
     if trainmode==False:
         try:
             vector = pickle.load(open("random.pickle", "rb"))
@@ -27,22 +32,46 @@ def RandomVector(trainmode=True,sz=100):
         for i in range(sz):
             tmp=random.uniform(0.5, 1.0)
             vector.append(tmp)
-        vector.to_pickle("random.pickle")
-    return vector
+    with open('random.pickle','wb') as f:
+        pickle.dump(array(vector), f)
+    return array(vector)
 
-def video2frame(sec,folderVID,file,folderIMG):
+
+# ## video2frame()
+
+# In[30]:
+
+
+def video2frame(count,sec,folderVID,file,folderIMG):
     import cv2
     vidcap = cv2.VideoCapture(folderVID+file)
     vidcap.set(cv2.CAP_PROP_POS_MSEC,sec*1000)
     hasFrames,image = vidcap.read()
     if hasFrames:
-        cv2.imwrite(folderIMG+file+'_'+str(count)+".jpg", image)     # save frame as JPG file
-    return hasFrames,folderIMG+file+'_'+str(count)+".jpg"
+        cv2.imwrite(folderIMG+str(count)+".jpg", image)     # save frame as JPG file
+    return hasFrames,folderIMG+str(count)+".jpg"   #folderIMG+file+'_'+str(count)+".jpg"
+
+
+# ### test
+
+# In[ ]:
+
+
+file='hd0456.mov'
+sec = 0
+frameRate = 0.5 #//it will capture image in each 0.5 second -> 2fps
+count=1
+success,a = video2frame(sec,'./',file,'./')
+while success:
+    count = count + 1
+    sec = sec + frameRate
+    sec = round(sec, 2)
+    success,a = video2frame(sec,'./',file,'./')
 
 
 # ## frame2features
 
-# In[2]:
+# In[81]:
 
 
 def frame2features(frame):
@@ -71,14 +100,23 @@ def frame2features(frame):
     feature = vgg16_feature_np.flatten()
     tf.reset_default_graph()
     vector = RandomVector(trainmode=True,sz=100)
-    return feature*vector
+    return np.dot(feature[:,None],vector[None,:])
 
 
-# ## Combined
+# ### test
 
-# In[3]:
+# In[ ]:
 
-def Video2feature(pathIn='../data/',frameRate=0.5, save=True):
+
+frame2features('1.jpg')
+
+
+# ## Video2feature()
+
+# In[83]:
+
+
+def Video2feature(pathIn='./data/',frameRate=0.5, save=True):
     import os
     import glob
     import numpy as np
@@ -93,19 +131,22 @@ def Video2feature(pathIn='../data/',frameRate=0.5, save=True):
     ftr_array=[]
 
     for f,s in index[['FILE','SEG']].values:
-        pathIn= '../data/'+f+'/'
-        print(pathlib.Path('pathIn').suffix)
-        pathOut='../data/'+f+'/frames/'
-        files=f+'_'+str(s)    
+      
+        pathOut=pathIn+f+'/frames/'
+        if not os.path.exists(pathOut):
+            os.makedirs(pathOut)
+     
+        files=f+'/'+str(s)   
         files=glob.glob(pathIn+files+'*')[0]
         suffix=os.path.splitext(files)[1]
-        files=f+'_'+str(s)+suffix
+        files=f+'/'+str(s)+suffix
         ftr_fr=[]
         filename=pathIn + files
         print(filename)
         sec = 0
         count=1
-        success,fr = video2frame(sec,pathIn,files,pathOut)
+        success,fr = video2frame(count,sec,pathIn,files,pathOut)
+        print(fr)
         ftr = frame2features(fr)
         ftr_fr.append(ftr)
 
@@ -113,7 +154,7 @@ def Video2feature(pathIn='../data/',frameRate=0.5, save=True):
             count = count + 1
             sec = sec + frameRate
             sec = round(sec, 2)
-            success,fr = video2frame(sec,pathIn,files,pathOut)
+            success,fr = video2frame(count,sec,pathIn,files,pathOut)
             if success == True:
                 print(fr)
                 ftr = frame2features(fr)
@@ -121,16 +162,35 @@ def Video2feature(pathIn='../data/',frameRate=0.5, save=True):
         ftr_fr = np.vstack(ftr_fr) 
         ftr_fr = np.average(ftr_fr, axis=0)
         ftr_array.append(ftr_fr)
+        
     ftr_array = np.vstack(ftr_array)
 
 
     ftr_df = pd.DataFrame(data=ftr_array)
     df=index.copy()
     df=pd.concat([df,ftr_df], axis=1)
-    # In[4]:
-    if save == True:
-        df.to_pickle('../data/Video2Features.pkl')
 
-    return
+    if save == True:
+        df.to_pickle(pathIn+'Video2Features.pkl')
+
+    return df
+
+
+# In[85]:
+
+
+df = Video2feature(pathIn='../data/',frameRate=0.5, save=False)
+df
+
+
+# In[33]:
+
+
+
+
 
 # In[ ]:
+
+
+
+
