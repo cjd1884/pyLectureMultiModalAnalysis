@@ -99,7 +99,6 @@ medium_1;part_46;interesting
 medium_1;part_47;neutral
 medium_1;part_48;interesting
 medium_1;part_49;neutral
-medium_1;part_50;neutral
 medium_4;part_0;interesting
 medium_4;part_1;neutral
 medium_4;part_2;neutral
@@ -150,7 +149,6 @@ medium_4;part_46;boring
 medium_4;part_47;boring
 medium_4;part_48;neutral
 medium_4;part_49;boring
-medium_4;part_50;neutral
 medium_5;part_0;interesting
 medium_5;part_1;neutral
 medium_5;part_2;interesting
@@ -251,4 +249,3 @@ medium_7;part_46;interesting
 medium_7;part_47;neutral
 medium_7;part_48;interesting
 medium_7;part_49;interesting
-medium_7;part_50;interesting
