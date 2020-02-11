@@ -36,7 +36,7 @@ RETURNS:
     file_names:
     
 """
-def audio_features_extraction(dir_name,mt_win,mt_step,st_win,st_step):
+def audio_features_extraction(dir_name="../data", mt_win=1.0, mt_step=1.0, st_win=0.050, st_step=0.050):
 
     features = []
     file_names = []
@@ -111,15 +111,8 @@ def audio_features_extraction(dir_name,mt_win,mt_step,st_win,st_step):
 
 def main(argv):
 
-    mt_win = 1.0
-    mt_step = 1.0
-    st_win = 0.050
-    st_step  = 0.050
-
-    dir_name = "../data"
-
     f, fn, feature_names = \
-        audio_features_extraction(dir_name,mt_win,mt_step,st_win,st_step)
+        audio_features_extraction()
 
     #print(f,fn,feature_names)
 
