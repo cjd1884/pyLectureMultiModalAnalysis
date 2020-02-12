@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import classification.classification as cl
+import Video2Features.Video2Features as vf
 
 def main():
     '''
@@ -39,6 +40,7 @@ def main():
     # TODO: Extract audio features
 
     # TODO: Extract video features
+    vf.Video2feature(pathIn='data/', trainmode=True)
 
     # TODO: Combine features
 
@@ -53,7 +55,8 @@ def main():
 
     # Train or evaluate model
     if args.a == 'eval_train':
-        acc = cl.evaluate_training(df)
+        # acc = cl.evaluate_training(df)
+        pass
     elif args.a == 'train':
         # cl.train(df)
         # TODO: Save trained model
