@@ -5,8 +5,8 @@
 # 
 # ## Feature extraction from video segment
 # 
-# ### Functions: 3
-# #### RandomVector(), video2frame(), frame2features()
+# ### Functions: 4
+# #### RandomVector(), video2frame(), frame2features(), Video2feature()
 # 
 # ### Author: Stelios Karozis
 
