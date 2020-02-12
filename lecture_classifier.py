@@ -40,7 +40,7 @@ def main():
     # TODO: Extract audio features
 
     # TODO: Extract video features
-    vf.Video2feature(pathIn='data/', trainmode=True)
+    vf.Video2feature(pathIn='data/', frameRate=4, save=True, trainmode=False)
 
     # TODO: Combine features
 
