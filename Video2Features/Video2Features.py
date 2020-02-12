@@ -74,14 +74,15 @@ def video2frame(count,sec,folderVID,file,folderIMG):
 # In[81]:
 
 
-def frame2features(frame):
+def frame2features(frame, trainmode=True):
     import tensorflow as tf
     from keras.preprocessing import image
     from keras.applications.vgg16 import VGG16
     from keras.applications.vgg16 import preprocess_input
     import numpy as np
 
-    config = tf.ConfigProto()
+    #config = tf.compat.v1.ConfigProto() # TF v2.0
+    config = tf.ConfigProto() # TF v1.0
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
 
@@ -99,7 +100,7 @@ def frame2features(frame):
     vgg16_feature_np = np.array(vgg16_feature)
     feature = vgg16_feature_np.flatten()
     tf.reset_default_graph()
-    vector = RandomVector(trainmode=True,sz=100)
+    vector = RandomVector(trainmode,sz=100)
     return np.dot(feature[:,None],vector[None,:])
 
 
@@ -108,7 +109,7 @@ def frame2features(frame):
 # In[ ]:
 
 
-#frame2features('1.jpg')
+#frame2features('1.jpg', trainmode=True)
 
 
 # ## Video2feature()
@@ -116,7 +117,7 @@ def frame2features(frame):
 # In[83]:
 
 
-def Video2feature(pathIn='./data/',frameRate=0.5, save=True):
+def Video2feature(pathIn='./data/',frameRate=4, save=True, trainmode=True ):
     import os
     import glob
     import numpy as np
@@ -147,7 +148,7 @@ def Video2feature(pathIn='./data/',frameRate=0.5, save=True):
         count=1
         success,fr = video2frame(count,sec,pathIn,files,pathOut)
         print(fr)
-        ftr = frame2features(fr)
+        ftr = frame2features(fr,trainmode)
         ftr_fr.append(ftr)
 
         while success:
@@ -157,7 +158,7 @@ def Video2feature(pathIn='./data/',frameRate=0.5, save=True):
             success,fr = video2frame(count,sec,pathIn,files,pathOut)
             if success == True:
                 print(fr)
-                ftr = frame2features(fr)
+                ftr = frame2features(fr,trainmode)
                 ftr_fr.append(ftr)
         ftr_fr = np.vstack(ftr_fr) 
         ftr_fr = np.average(ftr_fr, axis=0)
