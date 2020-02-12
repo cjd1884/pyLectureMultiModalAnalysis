@@ -5,8 +5,8 @@
 # 
 # ## Feature extraction from video segment
 # 
-# ### Functions: 2
-# #### video2frame(), frame2features()
+# ### Functions: 3
+# #### RandomVector(), video2frame(), frame2features()
 # 
 # ### Author: Stelios Karozis
 
@@ -57,16 +57,16 @@ def video2frame(count,sec,folderVID,file,folderIMG):
 # In[ ]:
 
 
-file='hd0456.mov'
-sec = 0
-frameRate = 0.5 #//it will capture image in each 0.5 second -> 2fps
-count=1
-success,a = video2frame(sec,'./',file,'./')
-while success:
-    count = count + 1
-    sec = sec + frameRate
-    sec = round(sec, 2)
-    success,a = video2frame(sec,'./',file,'./')
+# file='hd0456.mov'
+# sec = 0
+# frameRate = 0.5 #//it will capture image in each 0.5 second -> 2fps
+# count=1
+# success,a = video2frame(sec,'./',file,'./')
+# while success:
+    # count = count + 1
+    # sec = sec + frameRate
+    # sec = round(sec, 2)
+    # success,a = video2frame(sec,'./',file,'./')
 
 
 # ## frame2features
@@ -108,7 +108,7 @@ def frame2features(frame):
 # In[ ]:
 
 
-frame2features('1.jpg')
+#frame2features('1.jpg')
 
 
 # ## Video2feature()
