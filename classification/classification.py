@@ -1,6 +1,42 @@
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 import statistics as st
+import pickle
+
+# Dataframe Columns
+c_file = 'FILE'
+c_drop = ['FILE', 'SEG']
+c_label = 'CLASS_1'
+
+# Model default name
+model_name ='svm_model.sav'
+
+def save_model(model, data_dir='data'):
+    '''
+    Merely saves the provided ML model to a pickle file.
+    
+    :param model:       the trained model 
+    :param data_dir:    the data directory
+    '''
+
+    filename = data_dir + '/' + model_name
+    pickle.dump(model, open(filename, 'wb'))
+
+    print('SVM model saved in "' + filename + '"')
+
+
+def load_model(data_dir='data'):
+    '''
+    
+    :param data_dir: 
+    :return:            the loaded model 
+    '''
+    filename = data_dir + '/' + model_name
+    model = pickle.load(open(filename, 'rb'))
+
+    print('SVM model successfully loaded.')
+
+    return model
 
 
 def evaluate_training(df):
@@ -8,7 +44,7 @@ def evaluate_training(df):
     Evaluates the algorithm performance on learning the provided
     dataset. Run in rounds - each speaker versus all
 
-    :param df:          dataframe with audio & video data
+    :param df:          the dataframe with audio & video data
 
     '''
     # Unique speakers
@@ -36,21 +72,53 @@ def evaluate_training(df):
     return st.mean(acc_array)
 
 
+def train(df, data_dir='data'):
+    '''
+    Trains an SVM model in the provided dataset.
+
+    :param df:          the dataframe with audio & video data
+    :param data_dir:    the data directory
+    :return:            the trained model
+    '''
+    # Get train data (features and labels)
+    train = df.drop(c_drop, axis=1)
+    train_Y = train[c_label]
+    train_X = train[train.columns[1:]]
+
+    # Create the model
+    model = SVC(kernel='rbf')
+
+    # Fit
+    model.fit(train_X, train_Y)
+
+    print('SVM model trained.')
+
+    # Save model
+    save_model(model, data_dir)
+
+    return model
+
+
+def evaluate_target(model, target_df):
+
+    # Predict
+    pred_Y = model.predict(test_X)
+
+    # Evaluate and append
+    acc = accuracy_score(test_Y, pred_Y)
+
+
+
 def split_train_test(df, speaker):
     '''
     Splits the provided dataframe (audio & video fetures with
     speakers and labels) to train and test based on speaker 
     (one vs all).
 
-    :param df:          dataframe with audio & video data
-    :param speaker:     speaker for the 1 vs all
+    :param df:          the dataframe with audio & video data
+    :param speaker:     the speaker for the 1 vs all
 
     '''
-
-    # Dataframe Columns
-    c_file = 'FILE'
-    c_drop = ['FILE', 'SEG']
-    c_label = 'CLASS_1'
 
     # Train
     train = df[df[c_file] != speaker].drop(c_drop, axis=1)

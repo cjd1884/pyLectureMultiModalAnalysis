@@ -74,9 +74,7 @@ def main():
         acc = cl.evaluate_training(df)
         print('Evaluation completed.')
     elif args.a == 'train':
-        # cl.train(df)
-        # TODO: Save trained model
-        pass
+        cl.train(df)
     elif args.a == 'eval_target':
         # TODO: Load trained model
         # acc = cl.evaluate_target(df)
@@ -87,7 +85,7 @@ def main():
     #################################
 
     # Print results (only in evaluation cases)
-    if args.a != 'train':
+    if args.a == 'eval_train':
         print("Accuracy: " + str(acc))
 
 
