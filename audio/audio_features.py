@@ -9,12 +9,16 @@ import time
 import numpy as np
 import pandas as pd
 import logging
+import progressbar
 #logging.basicConfig(level=logging.DEBUG)
 
 #from pyAudioAnalysis import utilities
 from pyAudioAnalysis import audioBasicIO
 from pyAudioAnalysis import MidTermFeatures as aF
-import utilities as ut
+# import utilities as ut
+
+from . import video_to_audio as v2a
+
 
 """
 This function extracts the mid-term features of the WAVE files from the index CSV.
@@ -36,7 +40,12 @@ RETURNS:
     file_names:
     
 """
-def audio_features_extraction(dir_name="../data", mt_win=1.0, mt_step=1.0, st_win=0.050, st_step=0.050):
+def audio_features_extraction(dir_name="../data", mt_win=1.0, mt_step=1.0, st_win=0.050, st_step=0.050, features_audio_file='Audio2Features.pkl'):
+
+    audio_dir = dir_name + '/'+ 'audio'
+
+    # first, extract audio from video
+    v2a.video2audio(dir_name)
 
     features = []
     file_names = []
@@ -51,12 +60,18 @@ def audio_features_extraction(dir_name="../data", mt_win=1.0, mt_step=1.0, st_wi
     wav_file_list, mid_feature_names = [], []
 
     # iterate each audio file
+    print('Extracting features from audio files...')
+
+    bar = progressbar.ProgressBar(maxval=len(index_df), \
+                                  widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    bar.start()
+    bar_index = 0
     for ind in index_df.index:
         name = index_df['FILE'][ind]
         seg = str(index_df['SEG'][ind])
 
-        file_path = dir_name + '/' + name + '/' + name + '_' + seg + suffix
-        print("Analyzing file {0:d} of {1:d}: {2:s}".format(ind+1,len(index_df),file_path))
+        file_path = audio_dir + '/' + name + '/' + seg + suffix
+        # print("Analyzing file {0:d} of {1:d}: {2:s}".format(ind+1,len(index_df),file_path))
 
         if os.stat(file_path).st_size == 0:
             logging.warning("WARNING: EMPTY FILE -- SKIPPING")
@@ -94,18 +109,24 @@ def audio_features_extraction(dir_name="../data", mt_win=1.0, mt_step=1.0, st_wi
         duration = float(len(signal)) / sampling_rate
         process_times.append((t2 - t1) / duration)
 
+        # update progress bar index
+        bar_index += 1
+        bar.update(bar_index)
+
+    bar.finish()
+
     if len(process_times) > 0:
-        print("Feature extraction complexity ratio: "
+        print("Audio feature extraction completed. Complexity ratio: "
                 "{0:.1f} x realtime".format((1.0 /
                                             np.mean(np.array(process_times)))))
 
-    print(mid_term_features.shape)
+    print('Shape: ' + mid_term_features.shape)
 
     ftr_df = pd.DataFrame(data=mid_term_features)
     df=index_df.copy()
     df=pd.concat([df,ftr_df], axis=1)
     if True:
-        df.to_pickle('../data/Audio2Features.pkl')
+        df.to_pickle(dir_name + '/' + features_audio_file)
 
     return mid_term_features, wav_file_list, mid_feature_names
 

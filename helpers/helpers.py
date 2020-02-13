@@ -1,13 +1,14 @@
 import pandas as pd
 
-def merge_features(audio_pd, video_pd):
+def merge_features(video_df, audio_df):
     '''
-    Merging the audio & video dataframe into one single dataframe to be ready for training.
+    Merging the video & audio dataframe into one single dataframe to be ready for training.
 
-    :param audio_pd: the audio features dataframe
-    :param video_pd: the video features dataframe
-    :return: the merged feature dataframe
+    :param video_df: the video features dataframe
+    :param audio_df: the audio features dataframe
+    :return: the merged features dataframe
     '''
 
+    return pd.merge(video_df, audio_df, on=['FILE', 'SEG', 'CLASS_1'], how='inner', suffixes=['_v', '_a'])
 
 

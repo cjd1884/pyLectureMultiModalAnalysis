@@ -1,7 +1,17 @@
 import argparse
+import os.path as path
 import pandas as pd
 import classification.classification as cl
+import audio.audio_features as af
 import Video2Features.Video2Features as vf
+import helpers.helpers as helpers
+
+import matplotlib
+matplotlib.use('TkAgg')
+
+data_path = 'data'
+features_audio_file = 'Audio2Features.pkl'
+features_video_file = 'Video2Features.pkl'
 
 def main():
     '''
@@ -37,21 +47,26 @@ def main():
     # FEATURE EXTRACTION            #
     #################################
 
-    # TODO: Extract audio features
+    # Extract video features (if not already extracted)
+    if not path.exists(data_path + '/' + features_video_file):
+        vf.Video2feature(pathIn=data_path+'/', frameRate=4, save=True, trainmode=False)
+    video_df = pd.read_pickle(data_path + '/' + features_video_file)
+    print('Video features loaded.')
 
-    # TODO: Extract video features
-    vf.Video2feature(pathIn='data/', frameRate=4, save=True, trainmode=False)
+    # Extract audio features (if not already extracted)
+    if not path.exists(data_path + '/' + features_audio_file):
+        af.audio_features_extraction(dir_name=data_path, features_audio_file=features_audio_file)
+    audio_df = pd.read_pickle(data_path + '/' + features_audio_file)
+    print('Audio features loaded.')
 
-    # TODO: Combine features
-
+    # Combine features
+    df = helpers.merge_features(video_df, audio_df)
+    print('Video and audio features merged successfully.')
 
 
     #################################
     # MODEL TRAINING/EVALUATION     #
     #################################
-
-    # Load Data
-    df = pd.read_pickle("data/Video2Features.pkl")
 
     # Train or evaluate model
     if args.a == 'eval_train':
@@ -71,8 +86,8 @@ def main():
     #################################
 
     # Print results (only in evaluation cases)
-    if args.a != 'train':
-        print("Accuracy: " + str(acc))
+    # if args.a != 'train':
+    #     print("Accuracy: " + str(acc))
 
 
 
