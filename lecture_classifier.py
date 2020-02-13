@@ -37,11 +37,11 @@ def main():
     # Parameters
     args = parser.parse_args()
     if args.a == 'eval_train':
-        print("Training evaluation action selected.")
+        print("Action selected: [Training evaluation]")
     if args.a == 'train':
-        print("Model training action selected.")
+        print("Action selected: [Model training]")
     elif args.a == 'eval_target':
-        print("Target evaluation action selected.")
+        print("Action selected: [Target evaluation]")
 
     #################################
     # FEATURE EXTRACTION            #
@@ -70,8 +70,9 @@ def main():
 
     # Train or evaluate model
     if args.a == 'eval_train':
-        # acc = cl.evaluate_training(df)
-        pass
+        print('Evaluation started.')
+        acc = cl.evaluate_training(df)
+        print('Evaluation completed.')
     elif args.a == 'train':
         # cl.train(df)
         # TODO: Save trained model
@@ -86,8 +87,8 @@ def main():
     #################################
 
     # Print results (only in evaluation cases)
-    # if args.a != 'train':
-    #     print("Accuracy: " + str(acc))
+    if args.a != 'train':
+        print("Accuracy: " + str(acc))
 
 
 
