@@ -41,20 +41,20 @@ video_1;part_3;boring
 ```
 
 ```shell
-lecture_classifier.py -a eval_train
+python lecture_classifier.py -a eval_train
 ```
 
 ### Mode 2: Training
 In this mode, the SVM model is trained on the entire training dataset and it is then saved to disk.
 ```shell
-lecture_classifier.py -a train
+python lecture_classifier.py -a train
 ```
 
 ### Mode 3: Target evaluation
 The trained model (loaded from disk) is used to evaluate the target video provided for classification.
 Target video to be annotated by the algorithm should be placed under `data/target/` folder.
 ```shell
-lecture_classifier.py -a eval_target
+python lecture_classifier.py -a eval_target
 ```
 
 ## Authors
