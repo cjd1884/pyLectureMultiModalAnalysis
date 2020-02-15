@@ -26,7 +26,7 @@ def evaluate_training(df):
     '''
 
     # Preprocessing (standardisation and conversion of categorical values to numeric)
-    df = do_preprocessing(df, c_label)
+    df = do_preprocessing(df)
 
     # Unique speakers
     speakers = df['FILE'].unique()
@@ -34,6 +34,9 @@ def evaluate_training(df):
     # Array to hold model accuracy for each round
     acc_array = []
 
+    print('---------------------------')
+    print('    Confusion matrices     ')
+    print('---------------------------')
     for speaker in speakers:
         # Split dataframe to train-test based on current speaker
         train_X, train_Y, test_X, test_Y = split_train_test(df, speaker)
@@ -51,8 +54,10 @@ def evaluate_training(df):
         acc_array.append(accuracy_score(test_Y, pred_Y))
 
         # Print confusion matrix
-        print(confusion_matrix(y_pred=pred_Y, y_true=test_Y)
-)
+        cf = confusion_matrix(y_pred=pred_Y, y_true=test_Y, labels=['boring', 'neutral', 'interesting'])
+        print('Speaker: ' + speaker)
+        print('---------------------------')
+        print(cf)
 
     return st.mean(acc_array)
 
@@ -67,7 +72,7 @@ def train(df, data_dir='data'):
     '''
 
     # Preprocessing (standardisation and conversion of categorical values to numeric)
-    df = do_preprocessing(df, c_label)
+    df = do_preprocessing(df)
 
     # Get train data (features and labels)
     train = df.drop(c_drop, axis=1)
