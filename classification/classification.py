@@ -1,7 +1,6 @@
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
-from sklearn import preprocessing as pp
-import pandas as pd
+from sklearn.metrics import accuracy_score, confusion_matrix
+from .preprocessing import do_preprocessing
 import statistics as st
 import pickle
 
@@ -13,33 +12,9 @@ c_label = 'CLASS_1'
 # Model default name
 model_name ='svm_model.sav'
 
-def save_model(model, data_dir='data'):
-    '''
-    Merely saves the provided ML model to a pickle file.
-    
-    :param model:       the trained model 
-    :param data_dir:    the data directory
-    '''
-
-    filename = data_dir + '/' + model_name
-    pickle.dump(model, open(filename, 'wb'))
-
-    print('SVM model saved in "' + filename + '"')
-
-
-def load_model(data_dir='data'):
-    '''
-    
-    :param data_dir: 
-    :return:            the loaded model 
-    '''
-    filename = data_dir + '/' + model_name
-    model = pickle.load(open(filename, 'rb'))
-
-    print('SVM model successfully loaded.')
-
-    return model
-
+#############################
+# CLASSIFICATION METHODS    #
+#############################
 
 def evaluate_training(df):
     '''
@@ -50,8 +25,8 @@ def evaluate_training(df):
 
     '''
 
-    # Standardize dataframe
-    df = standardize(df)
+    # Preprocessing (standardisation and conversion of categorical values to numeric)
+    df = do_preprocessing(df, c_label)
 
     # Unique speakers
     speakers = df['FILE'].unique()
@@ -75,6 +50,10 @@ def evaluate_training(df):
         # Evaluate and append
         acc_array.append(accuracy_score(test_Y, pred_Y))
 
+        # Print confusion matrix
+        print(confusion_matrix(y_pred=pred_Y, y_true=test_Y)
+)
+
     return st.mean(acc_array)
 
 
@@ -87,8 +66,8 @@ def train(df, data_dir='data'):
     :return:            the trained model
     '''
 
-    # Standardize dataframe
-    df = standardize(df)
+    # Preprocessing (standardisation and conversion of categorical values to numeric)
+    df = do_preprocessing(df, c_label)
 
     # Get train data (features and labels)
     train = df.drop(c_drop, axis=1)
@@ -111,8 +90,8 @@ def train(df, data_dir='data'):
 
 def evaluate_target(model, target_df):
 
-    # Standardize dataframe
-    df = standardize(target_df)
+    # Preprocessing (standardisation and conversion of categorical values to numeric)
+    df = do_preprocessing(target_df)
 
     # Predict
     pred_Y = model.predict(test_X)
@@ -146,26 +125,33 @@ def split_train_test(df, speaker):
     return train_X, train_Y, test_X, test_Y
 
 
-def standardize(df):
+#############################
+# SAVE/LOAD MODEL METHODS   #
+#############################
+
+def save_model(model, data_dir='data'):
     '''
-    Standardizes the provided dataframe.
+    Merely saves the provided ML model to a pickle file.
 
-    :param df:  the input dataframe 
-    :return:    the standardized dataframe
+    :param model:       the trained model 
+    :param data_dir:    the data directory
     '''
 
-    # Get only float columns (containing data)
-    float_columns = df.select_dtypes(include=['float64']).columns.to_list()
-    string_columns = df.select_dtypes(exclude=['float64']).columns.to_list()
+    filename = data_dir + '/' + model_name
+    pickle.dump(model, open(filename, 'wb'))
 
-    # Create the Scaler object
-    scaler = pp.StandardScaler()
+    print('SVM model saved in "' + filename + '"')
 
-    # Fit your data on the scaler object
-    scaled_df = scaler.fit_transform(df[float_columns])
-    scaled_df = pd.DataFrame(scaled_df, columns=float_columns)
 
-    # Concat with non float columns (removed before standardization)
-    scaled_df = pd.concat([df[string_columns], scaled_df], axis=1, join='inner')
+def load_model(data_dir='data'):
+    '''
 
-    return scaled_df
+    :param data_dir: 
+    :return:            the loaded model 
+    '''
+    filename = data_dir + '/' + model_name
+    model = pickle.load(open(filename, 'rb'))
+
+    print('SVM model successfully loaded.')
+
+    return model
