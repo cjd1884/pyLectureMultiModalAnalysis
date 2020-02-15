@@ -137,24 +137,33 @@ def segment_medium(audio_fn,
     dir_ = os.path.join(out_dir, medium_)
     os.makedirs(dir_, mode=0o777, exist_ok=True)
 
-    # segment Video
-    for idx in range(len(segments)):
-        elapsed = segments[idx][1] - segments[idx][0]
-        start = time.strftime('%H:%M:%S', time.gmtime(segments[idx][0]))
-#        end = time.strftime('%H:%M:%S', time.gmtime(segments[idx][1]))
-        duration = time.strftime('%H:%M:%S', time.gmtime(elapsed))
+    with open('index.csv', 'a') as csvfile:
+		csvfile.write('FILE;SEG')
+		# segment Video
+		for idx in range(len(segments)):
+			elapsed = segments[idx][1] - segments[idx][0]
+			start = time.strftime('%H:%M:%S', time.gmtime(segments[idx][0]))
+	#        end = time.strftime('%H:%M:%S', time.gmtime(segments[idx][1]))
+			duration = time.strftime('%H:%M:%S', time.gmtime(elapsed))
 
-        # print(start)
-        # print(end)
-        output_name = 'part' + '_' + str(idx) + '.mp4'
-        output = os.path.join(dir_, output_name)
+			# print(start)
+			# print(end)
+			output_name = 'part' + '_' + str(idx) + '.mp4'
+			output = os.path.join(dir_, output_name)
 
-        inp = {medium_path: ['-ss', start]}
-        oup = {output: ['-to', duration, '-c', 'copy']}
+			#inp = {medium_path: ['-ss', start]}
+			#oup = {output: ['-to', duration, '-c', 'copy']}
+			
+			#ff = ffmpy.FFmpeg(inputs=inp, outputs=oup)
+			#print(ff.cmd)
+			#ff.run()
 
-        ff = ffmpy.FFmpeg(inputs=inp, outputs=oup)
-        print(ff.cmd)
-        ff.run()
+			#Use ffmpeg command instead
+			ffmpeg_command = 'ffmpeg -i ' + medium_path + '/' + filename +' -ss '+start+ ' -to'+duration + ' -c copy' + output +'/'+ output_name + ' -loglevel quiet'
+			os.system(ffmpeg_command)
+			
+			csvfile.write(output,';',output_name)
+
 
 
 # RUN
