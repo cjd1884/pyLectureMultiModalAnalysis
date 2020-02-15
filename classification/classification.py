@@ -27,6 +27,8 @@ def evaluate_training(df):
 
     # Preprocessing (standardisation and conversion of categorical values to numeric)
     df = do_preprocessing(df)
+    labels = ['boring', 'neutral', 'interesting']
+    # labels = [0, 2, 1] # Note: Use these labels if categorical -> numeric is done
 
     # Unique speakers
     speakers = df['FILE'].unique()
@@ -54,7 +56,7 @@ def evaluate_training(df):
         acc_array.append(accuracy_score(test_Y, pred_Y))
 
         # Print confusion matrix
-        cf = confusion_matrix(y_pred=pred_Y, y_true=test_Y, labels=['boring', 'neutral', 'interesting'])
+        cf = confusion_matrix(y_pred=pred_Y, y_true=test_Y, labels=labels)
         print('Speaker: ' + speaker)
         print('---------------------------')
         print(cf)
