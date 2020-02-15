@@ -60,7 +60,7 @@ def main():
     print('Audio features loaded.')
 
     # Combine features
-    df = helpers.merge_features(video_df, audio_df)
+    df = helpers.merge_features(video_df, audio_df, data_path)
     print('Video and audio features merged successfully.')
 
 
