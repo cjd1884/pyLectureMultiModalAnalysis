@@ -1,4 +1,5 @@
 import argparse
+import os
 import os.path as path
 import pandas as pd
 import classification.classification as cl
@@ -12,7 +13,10 @@ import helpers.av_segmentation as seg
 import matplotlib
 matplotlib.use('TkAgg')
 
-data_path = 'data'
+data_path_source = 'data'
+data_path_target = 'data/target'
+data_path = data_path_source
+
 features_audio_file = 'Audio2Features.pkl'
 features_video_file = 'Video2Features.pkl'
 
@@ -45,14 +49,16 @@ def main():
         print("Action selected: [Model training]")
     elif args.a == 'eval_target':
         print("Action selected: [Target evaluation]")
+        data_path = data_path_target
 
     #################################
     # FEATURE EXTRACTION            #
     #################################
-    
-    # Read input video(s), and perform segmantation based on silence points
-    seg.input2seg(audio_dir=data_path+'/target/audio/', video_dir=data_path+'/target/', output_folder=data_path+'/target/video/')
-    print('Segmentation is done.')
+
+    # Read input video(s), and perform segmantation based on silence points (only if not done already)
+    if len(os.listdir(data_path+'/video/')) == 0:
+        seg.input2seg(audio_dir=data_path+'/audio/', video_dir=data_path, output_folder=data_path+'/video/')
+        print('Segmentation is done.')
 
     # Extract video features (if not already extracted)
     if not path.exists(data_path + '/' + features_video_file):
@@ -83,9 +89,9 @@ def main():
     elif args.a == 'train':
         cl.train(df)
     elif args.a == 'eval_target':
-        # TODO: Load trained model
-        # acc = cl.evaluate_target(df)
-        ls.df2summary(df=df, folderDATA=data_path ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90, output_folder=data_path, output_name='summary.mp4')
+        fit_model = cl.load_model(data_path)
+        final_df = cl.evaluate_target(fit_model, df)
+        ls.df2summary(df=final_df, folderDATA=data_path+'/' ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90, output_folder=data_path, output_name='summary.mp4')
         pass
 
     #################################

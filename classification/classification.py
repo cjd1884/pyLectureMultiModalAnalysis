@@ -1,6 +1,7 @@
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, confusion_matrix
 from .preprocessing import do_preprocessing
+import pandas as pd
 import statistics as st
 import pickle
 
@@ -100,12 +101,20 @@ def evaluate_target(model, target_df):
     # Preprocessing (standardisation and conversion of categorical values to numeric)
     df = do_preprocessing(target_df)
 
+    # Get features from dataframe
+    target_data = df.drop(c_drop, axis=1)
+    target_data_X = train[train.columns]
+
     # Predict
-    pred_Y = model.predict(test_X)
+    pred_Y = model.predict(target_data_X)
 
-    # Evaluate and append
-    acc = accuracy_score(test_Y, pred_Y)
+    # Create the label series object
+    # pred_Y_df = pd.DataFrame({c_label: pred_Y})
 
+    # Merge target X & predicted Y
+    result_df = target_df.insert(2, c_label, pred_Y)
+
+    return result_df
 
 
 def split_train_test(df, speaker):

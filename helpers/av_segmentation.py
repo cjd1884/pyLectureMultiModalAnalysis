@@ -161,9 +161,19 @@ def segment_medium(audio_fn,
 # segment_medium(audio_fn='audio_1.wav', audio_dir='./audio_wav', media_dir='./media', out_dir='./segmented')
 
 def input2seg(audio_dir='../data/input_media/audio/', video_dir='../data/input_media/', output_folder='../data/video/'):
-    v2a.video2audio(video_dir)
+
+    # Settings
+    sampling_rate = "16000"
+    channels = "1"
+
+    # Video to audio
+    for filename in os.listdir(video_dir):
+        if filename.endswith(".mp4"):
+            ffmpeg_command = 'ffmpeg -i ' + video_dir + '/' + filename + ' -ar ' + sampling_rate + ' -ac ' + channels + ' ' + audio_dir + filename + '.wav' + ' -loglevel quiet'
+            os.system(ffmpeg_command)
+            break
+
+    #v2a.video2audio(video_dir)
     for filename in os.listdir(audio_dir):
         if filename.endswith(".wav"):
             segment_medium(audio_fn=filename,audio_dir=audio_dir,media_dir=video_dir,out_dir=output_folder)
-        else:
-            print('No audio files were found')
