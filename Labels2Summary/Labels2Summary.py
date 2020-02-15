@@ -5,8 +5,8 @@
 # 
 # ## Summary of video segments
 # 
-# ### Functions: 3
-# #### add_duration(), labels2summary(),summary2video()
+# ### Functions: 4
+# #### add_duration(), labels2summary(),summary2video(),df2summary()
 # 
 # ### Author: Stelios Karozis
 
@@ -23,12 +23,12 @@
 # In[439]:
 
 
-def add_duration(df=df):
+def add_duration(df, folder='../data/'):
     from pymediainfo import MediaInfo
     dur=[]
     for index,f in df.iterrows():
         #print(f['FILE'])
-        media_info = MediaInfo.parse('../data/'+f['FILE']+'/'+f['SEG']+'.mp4')
+        media_info = MediaInfo.parse(folder+f['FILE']+'/'+f['SEG']+'.mp4')
     #duration in milliseconds
         duration_in_s = media_info.tracks[0].duration/1000
         dur.append(duration_in_s)
@@ -45,7 +45,7 @@ def add_duration(df=df):
 # In[487]:
 
 
-def labels2summary(df=df, col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90):
+def labels2summary(df, col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90):
     summary={}
     i=0
     for l,p in zip(label, prc_l):
@@ -82,25 +82,25 @@ def labels2summary(df=df, col_cl='CLASS_1', label=['boring','interesting','neutr
 # In[485]:
 
 
-def summary2video(df=summary, output='summary.mp4'):
+def summary2video(df, output_folder='../data/', output_name='summary.mp4'):
     import os
     from pymediainfo import MediaInfo
     from moviepy.editor import VideoFileClip, concatenate_videoclips, TextClip
     
     try:
-        os.remove(output)
+        os.remove(output_name)
     except OSError:
         pass
     clips=[]
     for i, new_df in df.groupby(level=0):
         for folder,file in df.loc[i].iterrows():
             print(folder,file['SEG'])
-            clip = VideoFileClip('../data/'+folder+'/'+file['SEG']+'.mp4')
+            clip = VideoFileClip(output_folder+folder+'/'+file['SEG']+'.mp4')
             clips.append(clip)
     final_clip = concatenate_videoclips(clips)
-    final_clip.write_videofile('../data/'+output)
+    final_clip.write_videofile(output_folder+output_name)
     
-    media_info = MediaInfo.parse('../data/'+output)
+    media_info = MediaInfo.parse(output_folder+output_name)
     duration_in_s = media_info.tracks[0].duration/1000
     print('Summary duration is:', duration_in_s)
 
@@ -113,6 +113,13 @@ def summary2video(df=summary, output='summary.mp4'):
 
 # In[ ]:
 
+def df2summary(df, folderDATA='../data/' ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90, output_folder= '../data/', output_name='summary.mp4'):
 
+    df_dur=add_duration(df=df, folder=folderDATA)
 
+    summary=labels2summary(df=df_dur, col_cl=col_cl, label=label, prc_l=prc_l, col_d=col_d, duration_sec=duration_sec)
+
+    summary2video(df=summary, output_folder=output_folder, output_name=output_name)
+    
+    return print('Enjoy your summary video !')
 

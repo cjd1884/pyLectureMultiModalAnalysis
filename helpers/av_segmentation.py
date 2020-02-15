@@ -11,6 +11,9 @@ import librosa
 import time
 from pyAudioAnalysis.audioSegmentation import silenceRemoval as sR
 from pyAudioAnalysis.audioBasicIO import read_audio_file
+import sys
+sys.path.insert(0,'../')
+from audio import video_to_audio as v2a
 
 
 ######################
@@ -156,3 +159,11 @@ def segment_medium(audio_fn,
 
 # RUN
 # segment_medium(audio_fn='audio_1.wav', audio_dir='./audio_wav', media_dir='./media', out_dir='./segmented')
+
+def input2seg(audio_dir='../data/input_media/audio/', video_dir='../data/input_media/', output_folder='../data/video/'):
+    v2a.video2audio(video_dir)
+    for filename in os.listdir(audio_dir):
+        if filename.endswith(".wav"):
+            segment_medium(audio_fn=filename,audio_dir=audio_dir,media_dir=video_dir,out_dir=output_folder)
+        else:
+            print('No audio files were found')
