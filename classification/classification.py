@@ -1,5 +1,7 @@
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
+from sklearn import preprocessing as pp
+import pandas as pd
 import statistics as st
 import pickle
 
@@ -47,6 +49,10 @@ def evaluate_training(df):
     :param df:          the dataframe with audio & video data
 
     '''
+
+    # Standardize dataframe
+    df = standardize(df)
+
     # Unique speakers
     speakers = df['FILE'].unique()
 
@@ -80,6 +86,10 @@ def train(df, data_dir='data'):
     :param data_dir:    the data directory
     :return:            the trained model
     '''
+
+    # Standardize dataframe
+    df = standardize(df)
+
     # Get train data (features and labels)
     train = df.drop(c_drop, axis=1)
     train_Y = train[c_label]
@@ -100,6 +110,9 @@ def train(df, data_dir='data'):
 
 
 def evaluate_target(model, target_df):
+
+    # Standardize dataframe
+    df = standardize(target_df)
 
     # Predict
     pred_Y = model.predict(test_X)
@@ -131,3 +144,28 @@ def split_train_test(df, speaker):
     test_X = test[test.columns[1:]]
 
     return train_X, train_Y, test_X, test_Y
+
+
+def standardize(df):
+    '''
+    Standardizes the provided dataframe.
+
+    :param df:  the input dataframe 
+    :return:    the standardized dataframe
+    '''
+
+    # Get only float columns (containing data)
+    float_columns = df.select_dtypes(include=['float64']).columns.to_list()
+    string_columns = df.select_dtypes(exclude=['float64']).columns.to_list()
+
+    # Create the Scaler object
+    scaler = pp.StandardScaler()
+
+    # Fit your data on the scaler object
+    scaled_df = scaler.fit_transform(df[float_columns])
+    scaled_df = pd.DataFrame(scaled_df, columns=float_columns)
+
+    # Concat with non float columns (removed before standardization)
+    scaled_df = pd.concat([df[string_columns], scaled_df], axis=1, join='inner')
+
+    return scaled_df
