@@ -6,14 +6,12 @@
 ###########
 
 import os
-import ffmpy
 import librosa
 import time
 from pyAudioAnalysis.audioSegmentation import silenceRemoval as sR
 from pyAudioAnalysis.audioBasicIO import read_audio_file
-import sys
-sys.path.insert(0,'../')
-from audio import video_to_audio as v2a
+import shutil
+import progressbar
 
 
 ######################
@@ -100,9 +98,9 @@ def segment_audio(audio_fn,
 #######################
 
 def segment_medium(audio_fn,
-                   audio_dir='./data/audio_wav',
-                   media_dir='./data/media',
-                   out_dir='./data/segmented',
+                   audio_dir='./data/target/audio',
+                   media_dir='./data/target',
+                   out_dir='./data/target/video',
                    st_win=0.05,
                    st_step=0.05,
                    up_bound=20):
@@ -137,39 +135,57 @@ def segment_medium(audio_fn,
     dir_ = os.path.join(out_dir, medium_)
     os.makedirs(dir_, mode=0o777, exist_ok=True)
 
-    with open('index.csv', 'a') as csvfile:
-		csvfile.write('FILE;SEG')
-		# segment Video
-		for idx in range(len(segments)):
-			elapsed = segments[idx][1] - segments[idx][0]
-			start = time.strftime('%H:%M:%S', time.gmtime(segments[idx][0]))
-	#        end = time.strftime('%H:%M:%S', time.gmtime(segments[idx][1]))
-			duration = time.strftime('%H:%M:%S', time.gmtime(elapsed))
+    with open(media_dir + '/' + 'index.csv', 'w') as csvfile:
+        # Write header
+        csvfile.write('FILE;SEG\n')
 
-			# print(start)
-			# print(end)
-			output_name = 'part' + '_' + str(idx) + '.mp4'
-			output = os.path.join(dir_, output_name)
+        # [Visuals] Progress bar
+        bar = progressbar.ProgressBar(maxval=len(segments), \
+                                      widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+        bar.start()
+        bar_index = 0
 
-			#inp = {medium_path: ['-ss', start]}
-			#oup = {output: ['-to', duration, '-c', 'copy']}
-			
-			#ff = ffmpy.FFmpeg(inputs=inp, outputs=oup)
-			#print(ff.cmd)
-			#ff.run()
+        # Segment Video
+        for idx in range(len(segments)):
+            elapsed = segments[idx][1] - segments[idx][0]
+            start = time.strftime('%H:%M:%S', time.gmtime(segments[idx][0]))
+            duration = time.strftime('%H:%M:%S', time.gmtime(elapsed))
 
-			#Use ffmpeg command instead
-			ffmpeg_command = 'ffmpeg -i ' + medium_path + '/' + filename +' -ss '+start+ ' -to'+duration + ' -c copy' + output +'/'+ output_name + ' -loglevel quiet'
-			os.system(ffmpeg_command)
-			
-			csvfile.write(output,';',output_name)
+            output_name = 'part' + '_' + str(idx) + '.mp4'
+            output = os.path.join(dir_, output_name)
+
+            # Use ffmpeg to split video
+            ffmpeg_command = 'ffmpeg -i ' + medium_path + ' -ss ' + start + ' -t ' + duration + ' -c copy ' + output + ' -loglevel quiet'
+            os.system(ffmpeg_command)
+
+            folder_name = os.path.basename(dir_)
+
+            # Write to index file
+            csvfile.write(folder_name +  ';' + output_name + '\n')
+
+            # update progress bar index
+            bar_index += 1
+            bar.update(bar_index)
+
+        bar.finish()
 
 
 
 # RUN
 # segment_medium(audio_fn='audio_1.wav', audio_dir='./audio_wav', media_dir='./media', out_dir='./segmented')
 
-def input2seg(audio_dir='../data/input_media/audio/', video_dir='../data/input_media/', output_folder='../data/video/'):
+def input2seg(audio_dir='../data/target/audio/', video_dir='../data/target', output_folder='../data/target/video/'):
+
+    # Clear index file
+    index_file = video_dir + '/' + 'index.csv'
+    if os.path.exists(index_file):
+        os.remove(index_file)
+    # Clear target video folder
+    shutil.rmtree(output_folder)
+    os.mkdir(output_folder)
+    # Clear target audio folder
+    shutil.rmtree(audio_dir)
+    os.mkdir(audio_dir)
 
     # Settings
     sampling_rate = "16000"
@@ -182,7 +198,8 @@ def input2seg(audio_dir='../data/input_media/audio/', video_dir='../data/input_m
             os.system(ffmpeg_command)
             break
 
-    #v2a.video2audio(video_dir)
+    print('Target video segmentation started...')
+
     for filename in os.listdir(audio_dir):
         if filename.endswith(".wav"):
             segment_medium(audio_fn=filename,audio_dir=audio_dir,media_dir=video_dir,out_dir=output_folder)

@@ -43,22 +43,30 @@ def main():
 
     # Parameters
     args = parser.parse_args()
+    print("=================================")
     if args.a == 'eval_train':
-        print("Action selected: [Training evaluation]")
+        print("    [TRAINING-EVALUATION MODE]")
     if args.a == 'train':
-        print("Action selected: [Model training]")
+        print("    [MODEL TRAINING MODE]")
     elif args.a == 'eval_target':
-        print("Action selected: [Target evaluation]")
+        print("    [TARGET EVALUATION MODE]")
         data_path = data_path_target
+    print("=================================")
+
+
+    #################################
+    # SEGMENTATION - ONLY TARGET    #
+    #################################
+
+    # Make video segmentation based on silence
+    if args.a == 'eval_target':
+        seg.input2seg(audio_dir=data_path + '/audio/', video_dir=data_path, output_folder=data_path + '/video/')
+        print('Target video segmentation is complete.')
+
 
     #################################
     # FEATURE EXTRACTION            #
     #################################
-
-    # Read input video(s), and perform segmantation based on silence points (only if not done already)
-    if len(os.listdir(data_path+'/video/')) == 0:
-        seg.input2seg(audio_dir=data_path+'/audio/', video_dir=data_path, output_folder=data_path+'/video/')
-        print('Segmentation is done.')
 
     # Extract video features (if not already extracted)
     if not path.exists(data_path + '/' + features_video_file):
@@ -95,7 +103,7 @@ def main():
         pass
 
     #################################
-    # RESULTS                       #
+    # RESULTS - ONLY IN EVALUATION  #
     #################################
 
     # Print results (only in evaluation cases)
