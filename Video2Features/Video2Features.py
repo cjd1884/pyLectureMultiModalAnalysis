@@ -17,6 +17,7 @@
 
 def RandomVector(trainmode=True,sz=100):
     import pickle
+    import sys
     import numpy as np
     from numpy import array
     import random
@@ -26,7 +27,7 @@ def RandomVector(trainmode=True,sz=100):
     print(dirr)
     if trainmode==False:
         from pathlib import Path
-        my_file = Path(dir_path+'random.pickle')
+        my_file = Path(dirr+'/'+dir_path+'random.pickle')
         if my_file.is_file():
             # file exists
             print('Load random vector') 
@@ -35,6 +36,7 @@ def RandomVector(trainmode=True,sz=100):
             vector = pickle.load(open(random_vector, "rb"))
         else:
             print('Error the random vector is missing')
+            sys.exit()
     else:
         vector=[]
         for i in range(sz):
