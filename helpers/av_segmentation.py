@@ -161,7 +161,8 @@ def segment_medium(audio_fn,
             folder_name = os.path.basename(dir_)
 
             # Write to index file
-            csvfile.write(folder_name +  ';' + output_name + '\n')
+            ff,suf=output_name.split('.')
+            csvfile.write(folder_name +  ';' + ff + '\n')
 
             # update progress bar index
             bar_index += 1

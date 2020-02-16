@@ -73,7 +73,8 @@ def main():
         vf.Video2feature(pathIn=data_path+'/', frameRate=4, save=True, trainmode=False)
     video_df = pd.read_pickle(data_path + '/' + features_video_file)
     print('Video features loaded.')
-
+    import sys
+    sys.exit()
     # Extract audio features (if not already extracted)
     if not path.exists(data_path + '/' + features_audio_file):
         af.audio_features_extraction(dir_name=data_path, features_audio_file=features_audio_file)

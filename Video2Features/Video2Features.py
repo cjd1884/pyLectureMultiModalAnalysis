@@ -20,20 +20,28 @@ def RandomVector(trainmode=True,sz=100):
     import numpy as np
     from numpy import array
     import random
-    
+    dir_path='../'
+    import os 
+    dirr = os.path.dirname(os.path.realpath(__file__))
+    print(dirr)
     if trainmode==False:
-        try:
-            vector = pickle.load(open("random.pickle", "rb"))
-        except (OSError, IOError) as e:
-            vector = 3
+        from pathlib import Path
+        my_file = Path(dir_path+'random.pickle')
+        if my_file.is_file():
+            # file exists
+            print('Load random vector') 
+            random_vector = dirr+'/'+dir_path+'random.pickle'
+            print(dirr+random_vector)
+            vector = pickle.load(open(random_vector, "rb"))
+        else:
             print('Error the random vector is missing')
     else:
         vector=[]
         for i in range(sz):
             tmp=random.uniform(0.5, 1.0)
             vector.append(tmp)
-    with open('random.pickle','wb') as f:
-        pickle.dump(array(vector), f)
+        with open(random_vector,'wb') as f:
+            pickle.dump(array(vector), f)
     return array(vector)
 
 
@@ -79,13 +87,14 @@ def frame2features(frame, trainmode=True):
     from keras.preprocessing import image
     from keras.applications.vgg16 import VGG16
     from keras.applications.vgg16 import preprocess_input
+    from keras import backend as K
     import numpy as np
-
+    
+    K.clear_session()    
     #config = tf.compat.v1.ConfigProto() # TF v2.0
     config = tf.ConfigProto() # TF v1.0
     config.gpu_options.allow_growth = True
     sess = tf.Session(config=config)
-
     model = VGG16(weights='imagenet', include_top=False)
     #model.summary()
 
@@ -96,13 +105,13 @@ def frame2features(frame, trainmode=True):
     fr_data = preprocess_input(fr_data)
 
     vgg16_feature = model.predict(fr_data)
-
+    K.clear_session()
     vgg16_feature_np = np.array(vgg16_feature)
     feature = vgg16_feature_np.flatten()
     tf.reset_default_graph()
     vector = RandomVector(trainmode,sz=100)
     return np.dot(feature[:,None],vector[None,:])
-
+    #return feature 
 
 # ### test
 
@@ -133,20 +142,21 @@ def Video2feature(pathIn='./data/',frameRate=4, save=True, trainmode=True ):
 
     for f,s in index[['FILE','SEG']].values:
       
-        pathOut=pathIn+f+'/frames/'
+        pathOut=pathIn+'video/'+f+'/frames/'
         if not os.path.exists(pathOut):
             os.makedirs(pathOut)
      
         files=f+'/'+str(s)   
-        files=glob.glob(pathIn+files+'*')[0]
+        print(pathOut)
+        files=glob.glob(pathIn+'video/'+files+'*')[0]
         suffix=os.path.splitext(files)[1]
         files=f+'/'+str(s)+suffix
         ftr_fr=[]
-        filename=pathIn + files
+        filename=pathIn +'video/'+ files
         print(filename)
         sec = 0
         count=1
-        success,fr = video2frame(count,sec,pathIn,files,pathOut)
+        success,fr = video2frame(count,sec,pathIn+'video/',files,pathOut)
         print(fr)
         ftr = frame2features(fr,trainmode)
         ftr_fr.append(ftr)
@@ -155,7 +165,7 @@ def Video2feature(pathIn='./data/',frameRate=4, save=True, trainmode=True ):
             count = count + 1
             sec = sec + frameRate
             sec = round(sec, 2)
-            success,fr = video2frame(count,sec,pathIn,files,pathOut)
+            success,fr = video2frame(count,sec,pathIn+'video/',files,pathOut)
             if success == True:
                 print(fr)
                 ftr = frame2features(fr,trainmode)
