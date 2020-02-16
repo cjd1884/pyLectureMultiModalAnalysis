@@ -115,7 +115,7 @@ def summary2video(df, output_folder='../data/', output_name='summary.mp4'):
 
 def df2summary(df, folderDATA='../data/' ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90, output_folder= '../data/', output_name='summary.mp4'):
 
-    df_dur=add_duration(df=df, folder=folderDATA)
+    df_dur=add_duration(df=df, folder=folderDATA + '/video/')
 
     summary=labels2summary(df=df_dur, col_cl=col_cl, label=label, prc_l=prc_l, col_d=col_d, duration_sec=duration_sec)
 

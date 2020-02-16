@@ -120,7 +120,7 @@ def audio_features_extraction(dir_name="../data", mt_win=1.0, mt_step=1.0, st_wi
                 "{0:.1f} x realtime".format((1.0 /
                                             np.mean(np.array(process_times)))))
 
-    print('Shape: ' + mid_term_features.shape)
+    print('Shape: ' + str(mid_term_features.shape))
 
     ftr_df = pd.DataFrame(data=mid_term_features)
     df=index_df.copy()

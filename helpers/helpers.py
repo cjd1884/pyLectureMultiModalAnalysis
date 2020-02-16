@@ -9,8 +9,12 @@ def merge_features(video_df, audio_df, data_dir='data'):
     :return: the merged features dataframe
     '''
 
+    merge_key = ['FILE', 'SEG', 'CLASS_1']
+    if 'CLASS_1' not in video_df.columns:
+        merge_key = ['FILE', 'SEG']
+
     # Merge (join) dataframes
-    df = pd.merge(video_df, audio_df, on=['FILE', 'SEG', 'CLASS_1'], how='inner', suffixes=['_v', '_a'])
+    df = pd.merge(video_df, audio_df, on=merge_key, how='inner', suffixes=['_v', '_a'])
 
     # Save merged features dataframe
     df.to_pickle(data_dir + '/' + 'Features.pkl')

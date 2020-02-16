@@ -103,7 +103,7 @@ def evaluate_target(model, target_df):
 
     # Get features from dataframe
     target_data = df.drop(c_drop, axis=1)
-    target_data_X = train[train.columns]
+    target_data_X = target_data[target_data.columns]
 
     # Predict
     pred_Y = model.predict(target_data_X)
@@ -112,9 +112,9 @@ def evaluate_target(model, target_df):
     # pred_Y_df = pd.DataFrame({c_label: pred_Y})
 
     # Merge target X & predicted Y
-    result_df = target_df.insert(2, c_label, pred_Y)
+    target_df.insert(2, c_label, pred_Y)
 
-    return result_df
+    return target_df
 
 
 def split_train_test(df, speaker):
