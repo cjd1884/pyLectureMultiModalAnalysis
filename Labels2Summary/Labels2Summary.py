@@ -27,10 +27,11 @@ def add_duration(df, folder='../data/'):
     from pymediainfo import MediaInfo
     dur=[]
     for index,f in df.iterrows():
-        #print(f['FILE'])
         media_info = MediaInfo.parse(folder+f['FILE']+'/'+f['SEG']+'.mp4')
-    #duration in milliseconds
+    #duration in seconds
         duration_in_s = media_info.tracks[0].duration/1000
+#        print(folder+f['FILE']+'/'+f['SEG']+'.mp4')
+#        print(duration_in_s)
         dur.append(duration_in_s)
     df['DURATION']=dur
     return df
@@ -53,7 +54,6 @@ def labels2summary(df, col_cl='CLASS_1', label=['boring','interesting','neutral'
         
         #In order to meet the total duration of summary we use the avg duration of each class
         avg_dur=round(df_label[col_d].mean())
-        
         #We calculate the seconds correspond to each class
         #and then how many parts of each class (of avg duration) 
         #need to be used for each time span 
@@ -62,7 +62,7 @@ def labels2summary(df, col_cl='CLASS_1', label=['boring','interesting','neutral'
         else:
             ndx=int(len(df_label[col_cl])*p)
             
-        tmp=df_label[['FILE','SEG',col_cl]].iloc[0:ndx]
+        tmp=df_label[['FILE','SEG',col_cl,col_d]].iloc[0:ndx]
 
         i=i+1
         if i == 1:
@@ -118,7 +118,26 @@ def df2summary(df, folderDATA='../data/' ,col_cl='CLASS_1', label=['boring','int
     df_dur=add_duration(df=df, folder=folderDATA + '/video/')
 
     summary=labels2summary(df=df_dur, col_cl=col_cl, label=label, prc_l=prc_l, col_d=col_d, duration_sec=duration_sec)
-
+    #print(summary)
+    #Create csv timeline
+    import pandas as pd
+    timeline=[]
+    cnt=0
+    for index, row in summary.iterrows():
+        #print(index, row[col_d])
+        cnt = cnt + 1
+        if cnt == 1:
+            vl=0
+            timeline.append(vl)
+            tmp=row[col_d]
+        else:
+            vl=vl+tmp
+            timeline.append(vl)
+            tmp=row[col_d]
+    summary['TIMELINE'] = pd.Series(timeline).values
+    summary.to_csv(output_folder+'_timeline.csv')
+    #
+    
     summary2video(df=summary, output_folder=output_folder, output_name=output_name)
     
     return print('Enjoy your summary video !')
