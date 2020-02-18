@@ -60,7 +60,7 @@ def evaluate_training(df):
         cf = confusion_matrix(y_pred=pred_Y, y_true=test_Y, labels=labels)
         print('Speaker: ' + speaker)
         print('---------------------------')
-        print(cf.T)
+        print(cf)
 
     return st.mean(acc_array)
 
