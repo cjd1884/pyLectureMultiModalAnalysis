@@ -14,7 +14,9 @@ import matplotlib
 matplotlib.use('TkAgg')
 
 data_path_source = 'data'
-data_path_target = 'data/target'
+# data_path_target = 'data/target'
+# data_path_target = 'data/target_1m'
+data_path_target = 'data/target_5m'
 
 features_audio_file = 'Audio2Features.pkl'
 features_video_file = 'Video2Features.pkl'
@@ -59,11 +61,10 @@ def main():
     # SEGMENTATION - ONLY TARGET    #
     #################################
 
-    # TODO: Uncomment me
     # Make video segmentation based on silence
-    # if args.a == 'eval_target':
-    #     seg.input2seg(audio_dir=data_path + '/audio/', video_dir=data_path, output_folder=data_path + '/video/')
-    #     print('Target video segmentation is complete.')
+    if args.a == 'eval_target':
+        seg.input2seg(audio_dir=data_path + '/audio/', video_dir=data_path, output_folder=data_path + '/video/')
+        print('Target video segmentation is complete.')
 
 
     #################################
@@ -101,6 +102,7 @@ def main():
     elif args.a == 'eval_target':
         fit_model = cl.load_model(data_path)
         final_df = cl.evaluate_target(fit_model, df)
+        print('Video prediction complete. Summarization process should follow.')
 
 
     #################################

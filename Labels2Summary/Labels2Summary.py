@@ -47,6 +47,7 @@ def add_duration(df, folder='../data/'):
 
 
 def labels2summary(df, col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.34,0.36], col_d='DURATION', duration_sec=90):
+    import pandas as pd
     summary={}
     i=0
 
@@ -54,17 +55,14 @@ def labels2summary(df, col_cl='CLASS_1', label=['boring','interesting','neutral'
     new_label=[]
     new_prc_l=[]
     existing_labels = df[col_cl].unique()
-    for i in range(0,len(existing_labels)):
-        current_label = existing_labels[i]
+    for j in range(0,len(existing_labels)):
+        current_label = existing_labels[j]
         new_label.append(current_label)
         arr_index = label.index(current_label) # get index in arrays
         new_prc_l.append(prc_l[arr_index])
 
     for l,p in zip(new_label, new_prc_l):
         df_label=df.loc[df[col_cl] == l]
-
-        # TODO: Delete me
-        df.to_pickle('DELETE_ME.pkl')
 
         #In order to meet the total duration of summary we use the avg duration of each class
         avg_dur=round(df_label[col_d].mean())
@@ -108,7 +106,7 @@ def summary2video(df, output_folder='../data/', output_name='summary.mp4'):
     clips=[]
     for i, new_df in df.groupby(level=0):
         for folder,file in df.loc[i].iterrows():
-            print(folder,file['SEG'])
+            #print(folder,file['SEG'])
             clip = VideoFileClip(output_folder+'/'+folder+'/'+file['SEG']+'.mp4')
             clips.append(clip)
     final_clip = concatenate_videoclips(clips)

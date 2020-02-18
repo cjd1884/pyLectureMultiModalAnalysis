@@ -1,0 +1,7 @@
+CLASS_1,FILE,index,SEG,DURATION,TIMELINE
+neutral,lecture_5m,0,part_0,19.018,0.0
+neutral,lecture_5m,2,part_2,17.999,19.018
+interesting,lecture_5m,1,part_1,18.992,37.016999999999996
+interesting,lecture_5m,12,part_12,19.018,56.009
+boring,lecture_5m,9,part_9,9.013,75.027
+boring,lecture_5m,10,part_10,17.006,84.04

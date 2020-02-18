@@ -30,9 +30,9 @@ def RandomVector(trainmode=True,sz=100, debug=False):
         my_file = Path(dirr+'/'+dir_path+'random.pickle')
         if my_file.is_file():
             # file exists
-            print('Load random vector') 
+            if debug is True: print('Load random vector')
             random_vector = dirr+'/'+dir_path+'random.pickle'
-            print(dirr+random_vector)
+            if debug is True: print(dirr+random_vector)
             vector = pickle.load(open(random_vector, "rb"))
         else:
             print('Error the random vector is missing')
@@ -133,6 +133,7 @@ def Video2feature(pathIn='./data/',frameRate=4, save=True, trainmode=True ):
     import glob
     import numpy as np
     import pandas as pd
+    import progressbar
     import pathlib
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -142,6 +143,14 @@ def Video2feature(pathIn='./data/',frameRate=4, save=True, trainmode=True ):
     frameRate = frameRate #//it will capture image in each 0.5 second -> 2fps
     ftr_array=[]
 
+    print('Extracting features from videos...')
+
+    # [Visuals] Progress bar
+    bar = progressbar.ProgressBar(maxval=index.shape[0], \
+                                  widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    bar.start()
+    bar_index = 0
+
     for f,s in index[['FILE','SEG']].values:
       
         pathOut=pathIn+'video/'+f+'/frames/'
@@ -149,17 +158,17 @@ def Video2feature(pathIn='./data/',frameRate=4, save=True, trainmode=True ):
             os.makedirs(pathOut)
      
         files=f+'/'+str(s)   
-        print(pathOut)
+        # print(pathOut)
         files=glob.glob(pathIn+'video/'+files+'*')[0]
         suffix=os.path.splitext(files)[1]
         files=f+'/'+str(s)+suffix
         ftr_fr=[]
         filename=pathIn +'video/'+ files
-        print(filename)
+        # print(filename)
         sec = 0
         count=1
         success,fr = video2frame(count,sec,pathIn+'video/',files,pathOut)
-        print(fr)
+        # print(fr)
         ftr = frame2features(fr,trainmode)
         ftr_fr.append(ftr)
 
@@ -169,12 +178,18 @@ def Video2feature(pathIn='./data/',frameRate=4, save=True, trainmode=True ):
             sec = round(sec, 2)
             success,fr = video2frame(count,sec,pathIn+'video/',files,pathOut)
             if success == True:
-                print(fr)
+                # print(fr)
                 ftr = frame2features(fr,trainmode)
                 ftr_fr.append(ftr)
         ftr_fr = np.vstack(ftr_fr) 
         ftr_fr = np.average(ftr_fr, axis=0)
         ftr_array.append(ftr_fr)
+
+        # update progress bar index
+        bar_index += 1
+        bar.update(bar_index)
+
+    bar.finish()
         
     ftr_array = np.vstack(ftr_array)
 

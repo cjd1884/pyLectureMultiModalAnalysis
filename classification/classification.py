@@ -53,8 +53,6 @@ def evaluate_training(df):
         # Predict
         pred_Y = model.predict(test_X)
 
-        print(pred_Y)
-
         # Evaluate and append
         acc_array.append(accuracy_score(test_Y, pred_Y))
 
@@ -62,7 +60,7 @@ def evaluate_training(df):
         cf = confusion_matrix(y_pred=pred_Y, y_true=test_Y, labels=labels)
         print('Speaker: ' + speaker)
         print('---------------------------')
-        print(cf)
+        print(cf.T)
 
     return st.mean(acc_array)
 
