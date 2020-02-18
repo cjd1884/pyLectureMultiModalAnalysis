@@ -15,7 +15,6 @@ matplotlib.use('TkAgg')
 
 data_path_source = 'data'
 data_path_target = 'data/target'
-data_path = data_path_source
 
 features_audio_file = 'Audio2Features.pkl'
 features_video_file = 'Video2Features.pkl'
@@ -46,8 +45,10 @@ def main():
     print("=================================")
     if args.a == 'eval_train':
         print("    [TRAINING-EVALUATION MODE]")
+        data_path = data_path_source
     if args.a == 'train':
         print("    [MODEL TRAINING MODE]")
+        data_path = data_path_source
     elif args.a == 'eval_target':
         print("    [TARGET EVALUATION MODE]")
         data_path = data_path_target
@@ -58,10 +59,11 @@ def main():
     # SEGMENTATION - ONLY TARGET    #
     #################################
 
+    # TODO: Uncomment me
     # Make video segmentation based on silence
-    if args.a == 'eval_target':
-        seg.input2seg(audio_dir=data_path + '/audio/', video_dir=data_path, output_folder=data_path + '/video/')
-        print('Target video segmentation is complete.')
+    # if args.a == 'eval_target':
+    #     seg.input2seg(audio_dir=data_path + '/audio/', video_dir=data_path, output_folder=data_path + '/video/')
+    #     print('Target video segmentation is complete.')
 
 
     #################################
@@ -99,8 +101,7 @@ def main():
     elif args.a == 'eval_target':
         fit_model = cl.load_model(data_path)
         final_df = cl.evaluate_target(fit_model, df)
-        ls.df2summary(df=final_df, folderDATA=data_path+'/' ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90, output_folder=data_path, output_name='summary.mp4')
-        pass
+
 
     #################################
     # RESULTS - ONLY IN EVALUATION  #
@@ -109,6 +110,15 @@ def main():
     # Print results (only in evaluation cases)
     if args.a == 'eval_train':
         print("Accuracy: " + str(acc))
+
+
+    #################################
+    # RESULTS - TARGET EVALUATION   #
+    #################################
+
+    # Make the summarisation video
+    if args.a == 'eval_target':
+        ls.df2summary(df=final_df, folderDATA=data_path+'/' ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.34,0.36], col_d='DURATION', duration_sec=90, output_folder=data_path, output_name='summary.mp4')
 
 
 

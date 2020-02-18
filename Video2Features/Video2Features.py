@@ -15,7 +15,7 @@
 # In[51]:
 
 
-def RandomVector(trainmode=True,sz=100):
+def RandomVector(trainmode=True,sz=100, debug=False):
     import pickle
     import sys
     import numpy as np
@@ -24,7 +24,7 @@ def RandomVector(trainmode=True,sz=100):
     dir_path='../'
     import os 
     dirr = os.path.dirname(os.path.realpath(__file__))
-    print(dirr)
+    if debug is True: print(dirr)
     if trainmode==False:
         from pathlib import Path
         my_file = Path(dirr+'/'+dir_path+'random.pickle')

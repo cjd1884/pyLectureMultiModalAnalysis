@@ -53,6 +53,8 @@ def evaluate_training(df):
         # Predict
         pred_Y = model.predict(test_X)
 
+        print(pred_Y)
+
         # Evaluate and append
         acc_array.append(accuracy_score(test_Y, pred_Y))
 

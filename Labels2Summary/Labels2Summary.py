@@ -46,12 +46,26 @@ def add_duration(df, folder='../data/'):
 # In[487]:
 
 
-def labels2summary(df, col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90):
+def labels2summary(df, col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.34,0.36], col_d='DURATION', duration_sec=90):
     summary={}
     i=0
-    for l,p in zip(label, prc_l):
+
+    # TODO: Refactor me
+    new_label=[]
+    new_prc_l=[]
+    existing_labels = df[col_cl].unique()
+    for i in range(0,len(existing_labels)):
+        current_label = existing_labels[i]
+        new_label.append(current_label)
+        arr_index = label.index(current_label) # get index in arrays
+        new_prc_l.append(prc_l[arr_index])
+
+    for l,p in zip(new_label, new_prc_l):
         df_label=df.loc[df[col_cl] == l]
-        
+
+        # TODO: Delete me
+        df.to_pickle('DELETE_ME.pkl')
+
         #In order to meet the total duration of summary we use the avg duration of each class
         avg_dur=round(df_label[col_d].mean())
         #We calculate the seconds correspond to each class
@@ -95,12 +109,12 @@ def summary2video(df, output_folder='../data/', output_name='summary.mp4'):
     for i, new_df in df.groupby(level=0):
         for folder,file in df.loc[i].iterrows():
             print(folder,file['SEG'])
-            clip = VideoFileClip(output_folder+folder+'/'+file['SEG']+'.mp4')
+            clip = VideoFileClip(output_folder+'/'+folder+'/'+file['SEG']+'.mp4')
             clips.append(clip)
     final_clip = concatenate_videoclips(clips)
-    final_clip.write_videofile(output_folder+output_name)
+    final_clip.write_videofile(output_folder+'/'+output_name)
     
-    media_info = MediaInfo.parse(output_folder+output_name)
+    media_info = MediaInfo.parse(output_folder+'/'+output_name)
     duration_in_s = media_info.tracks[0].duration/1000
     print('Summary duration is:', duration_in_s)
 
@@ -113,9 +127,9 @@ def summary2video(df, output_folder='../data/', output_name='summary.mp4'):
 
 # In[ ]:
 
-def df2summary(df, folderDATA='../data/' ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90, output_folder= '../data/', output_name='summary.mp4'):
+def df2summary(df, folderDATA='../data/' ,col_cl='CLASS_1', label=['boring','interesting','neutral'], prc_l=[0.30,0.35,0.35], col_d='DURATION', duration_sec=90, output_folder= '../data/video/', output_name='summary.mp4'):
 
-    df_dur=add_duration(df=df, folder=folderDATA + '/video/')
+    df_dur=add_duration(df=df, folder=folderDATA + 'video/')
 
     summary=labels2summary(df=df_dur, col_cl=col_cl, label=label, prc_l=prc_l, col_d=col_d, duration_sec=duration_sec)
     #print(summary)
@@ -135,10 +149,10 @@ def df2summary(df, folderDATA='../data/' ,col_cl='CLASS_1', label=['boring','int
             timeline.append(vl)
             tmp=row[col_d]
     summary['TIMELINE'] = pd.Series(timeline).values
-    summary.to_csv(output_folder+'_timeline.csv')
+    summary.to_csv(output_folder+'/video/'+'timeline.csv')
     #
     
-    summary2video(df=summary, output_folder=output_folder, output_name=output_name)
+    summary2video(df=summary, output_folder=output_folder+'/video', output_name=output_name)
     
     return print('Enjoy your summary video !')
 
